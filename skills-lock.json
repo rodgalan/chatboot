@@ -13,6 +13,12 @@
       "skillPath": ".agents/skills/codely-plan-create-github/SKILL.md",
       "computedHash": "41244c5331be094d90729aa5612881257dce37eb27738803aa8100c53cff829d"
     },
+    "codely-plan-create-subagents": {
+      "source": "codelytv/agent-harness",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/codely-plan-create/SKILL.md",
+      "computedHash": "aeee6352082672da843fe0c865582f103eef33f7b275eac0c1347eefda9a7f0f"
+    },
     "codely-plan_phase-implement": {
       "source": "codelytv/agent-harness",
       "sourceType": "github",
