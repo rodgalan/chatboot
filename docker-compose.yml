@@ -11,6 +11,17 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./databases:/docker-entrypoint-initdb.d
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "8025:8025" # Interfaz Web para ver los emails
+      - "1025:1025" # Puerto SMTP
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
 
 volumes:
   db_data:
