@@ -3,6 +3,7 @@ plugins {
 	kotlin("plugin.spring") version "2.3.21"
 	id("org.springframework.boot") version "4.1.0"
 	id("io.spring.dependency-management") version "1.1.7"
+	`jvm-test-suite`
 }
 
 group = "com.rodgalan"
@@ -27,12 +28,6 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("tools.jackson.module:jackson-module-kotlin")
 	runtimeOnly("org.postgresql:postgresql")
-	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {
@@ -41,6 +36,27 @@ kotlin {
 	}
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+testing {
+	suites {
+		val test by getting(JvmTestSuite::class) {
+			useJUnitJupiter()
+			dependencies {
+				implementation("org.jetbrains.kotlin:kotlin-test-junit5")
+				runtimeOnly("org.junit.platform:junit-platform-launcher")
+			}
+		}
+
+		register<JvmTestSuite>("integrationTest") {
+			useJUnitJupiter()
+			dependencies {
+				implementation(project())
+				implementation("org.springframework.boot:spring-boot-starter-flyway-test")
+				implementation("org.springframework.boot:spring-boot-starter-jdbc-test")
+				implementation("org.springframework.boot:spring-boot-starter-restclient-test")
+				implementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+				implementation("org.jetbrains.kotlin:kotlin-test-junit5")
+				runtimeOnly("org.junit.platform:junit-platform-launcher")
+			}
+		}
+	}
 }
