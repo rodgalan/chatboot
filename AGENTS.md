@@ -30,6 +30,28 @@ docker compose down        # Stop it
 - `{context}/application` — Use cases, DTOs, orchestration
 - `{context}/infrastructure` — Persistence, external integrations, adapters
 
+## Testing Strategy
+
+To ensure reliability and maintainability without over-testing implementation details, follow these guidelines for every feature:
+
+### 0. Core principle
+* Preserve the Test Pyramid
+* All the behavior covered
+
+### 1. Integration Tests (End-to-End Happy Path)
+* **Scope:** Every feature must include at least **one integration test** covering the happy path from the entry point down to the infrastructure layer.
+* **Purpose:** Verify that all layers and wiring work together as expected under normal execution flow.
+
+### 2. Unit Testing Strategy
+All edge cases, validations, and error conditions must be covered using unit tests.
+
+* **Behavior-Driven Testing:** Focus tests on **behavior and outcomes**, not individual private methods or implementation details. Refactoring internal logic should not break unit tests.
+* **Controller & Entry Port Tests:** Use unit tests at the entry ports / controllers to validate input handling, contract validation, and HTTP/API error mapping.
+* **Use Case Tests (Application + Domain):**
+    * Test application and domain logic **jointly** starting from the Use Case layer.
+    * Mock infrastructure dependencies (e.g., repositories, external services) at the port interfaces.
+    * Thoroughly cover edge cases, business rule violations, domain exceptions, and state transitions.
+
 
 # Documentation
 
