@@ -6,3 +6,19 @@ spring:
     username: anna
     password: 123456789
     driver-class-name: org.postgresql.Driver
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+chatboot:
+  users:
+    email-verification:
+      from: no-reply@chatboot.local
+      verification-url-template: "http://localhost:3000/verify-email?token={token}"
+      token-ttl: PT24H

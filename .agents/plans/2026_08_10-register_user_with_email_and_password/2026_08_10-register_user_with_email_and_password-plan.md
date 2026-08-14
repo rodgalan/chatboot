@@ -9,6 +9,16 @@ created_by:
     name: "Claude Opus"
     version: "5"
     reasoning_effort: "high"
+
+implemented_by:
+  tool: "Claude Code"
+  model:
+    name: "Claude Sonnet"
+    version: "5"
+    reasoning_effort: "medium"
+
+last_implementation_at: "2026-08-10T06:49:24Z"
+has_completed_all_phases: false
 ---
 
 # Register user with email and password
@@ -45,7 +55,7 @@ This is a greenfield feature. There is no domain, application or infrastructure 
 ### Decisions taken with the user
 
 - **Bounded context**: `com.rodgalan.chatboot.users`, split into `domain`, `application` and `infrastructure`.
-- **New dependencies approved**: `spring-boot-starter-mail` (+ `spring-boot-starter-mail-test`) and `io.mockk:mockk`. Nothing else.
+- **New dependencies approved**: `spring-boot-starter-mail` (+ `spring-boot-starter-mail-test`), `io.mockk:mockk`, and `spring-boot-starter-webmvc-test` in the unit `test` suite (approved in Phase 2 so `UserPostControllerTest` can drive a standalone `MockMvc` against the controller + `@RestControllerAdvice` pair and assert real HTTP status codes). Nothing else.
 - **Password hashing**: `spring-boot-starter-security` and `spring-security-crypto` were **not** approved, and neither is present transitively on the runtime classpath. Hashing therefore uses **PBKDF2WithHmacSHA256 from the JDK** (`javax.crypto.SecretKeyFactory`) behind a `PasswordHasher` port. If BCrypt or Argon2 is wanted later, only the adapter behind that port changes.
 - **Request validation**: `spring-boot-starter-validation` was **not** approved. Validation lives in the domain value objects (`Email`, password policy), and the controller maps domain errors to HTTP status codes. Malformed or incomplete JSON bodies are rejected by Jackson against non-nullable Kotlin request DTOs.
 - **Domain events**: published in-process through Spring's `ApplicationEventPublisher`, hidden behind a `DomainEventPublisher` port. Kafka stays unused; swapping to it later is a single adapter change.
@@ -158,14 +168,14 @@ Created in Phase 3:
 
 Add the only new dependencies of the feature and wire the application to the Mailpit container, without touching business behavior. After this phase the application still boots and the test suites still pass, and the mail infrastructure is proven to be correctly configured.
 
-- [ ] Add `implementation("org.springframework.boot:spring-boot-starter-mail")` to the `dependencies` block of `build.gradle.kts`.
-- [ ] Add `implementation("io.mockk:mockk")` to the `test` suite and `implementation("org.springframework.boot:spring-boot-starter-mail-test")` plus `implementation("io.mockk:mockk")` to the `integrationTest` suite in `build.gradle.kts`. Pin the MockK version explicitly, since it is not managed by the Spring Boot BOM.
-- [ ] Configure the SMTP connection to Mailpit in `src/main/resources/application.yaml` under `spring.mail` (`host: localhost`, `port: 1025`, SMTP auth and STARTTLS disabled).
-- [ ] Add the feature configuration keys in `src/main/resources/application.yaml` under a `chatboot.users.email-verification` namespace: `from` (sender address), `verification-url-template` (frontend URL containing a `{token}` placeholder) and `token-ttl` (an ISO-8601 duration, defaulting to 24 hours).
-- [ ] Create `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/config/EmailVerificationProperties.kt` as a `@ConfigurationProperties`-bound class exposing those three keys, and register it so Spring binds it.
-- [ ] Add `src/integrationTest/kotlin/com/rodgalan/chatboot/users/infrastructure/config/EmailVerificationConfigurationTest.kt` with a test asserting that the context loads with the `JavaMailSender` bean available and the `EmailVerificationProperties` bound to the configured values.
-- [ ] Verify the changes in terms of typechecking, linting and tests using the project's verification command (`./gradlew check`, with `docker compose up -d` running). Fix issues if any.
-- [ ] STOP. Present the changes to the user for review and suggest commit messages. Do NOT proceed to the next phase until the user explicitly asks.
+- [x] Add `implementation("org.springframework.boot:spring-boot-starter-mail")` to the `dependencies` block of `build.gradle.kts`.
+- [x] Add `implementation("io.mockk:mockk")` to the `test` suite and `implementation("org.springframework.boot:spring-boot-starter-mail-test")` plus `implementation("io.mockk:mockk")` to the `integrationTest` suite in `build.gradle.kts`. Pin the MockK version explicitly, since it is not managed by the Spring Boot BOM.
+- [x] Configure the SMTP connection to Mailpit in `src/main/resources/application.yaml` under `spring.mail` (`host: localhost`, `port: 1025`, SMTP auth and STARTTLS disabled).
+- [x] Add the feature configuration keys in `src/main/resources/application.yaml` under a `chatboot.users.email-verification` namespace: `from` (sender address), `verification-url-template` (frontend URL containing a `{token}` placeholder) and `token-ttl` (an ISO-8601 duration, defaulting to 24 hours).
+- [x] Create `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/config/EmailVerificationProperties.kt` as a `@ConfigurationProperties`-bound class exposing those three keys, and register it so Spring binds it.
+- [x] Add `src/integrationTest/kotlin/com/rodgalan/chatboot/users/infrastructure/config/EmailVerificationConfigurationTest.kt` with a test asserting that the context loads with the `JavaMailSender` bean available and the `EmailVerificationProperties` bound to the configured values.
+- [x] Verify the changes in terms of typechecking, linting and tests using the project's verification command (`./gradlew check`, with `docker compose up -d` running). Fix issues if any.
+- [x] STOP. Present the changes to the user for review and suggest commit messages. Do NOT proceed to the next phase until the user explicitly asks.
 
 ### Phase 2: Register a user with email and password
 
@@ -214,6 +224,6 @@ End-to-end vertical slice of activation: registering now sends a verification em
 
 ## ⏭️ Next step
 
-Start with Phase 1 to add the mail dependency and wire the application to the Mailpit container before any business logic lands.
+Continue with Phase 2 to implement the end-to-end registration slice (`POST /api/v1/users`), now that the mail dependency and configuration are wired and verified.
 
-Registration plan hatched by 🐢 💨 (Turbotuga™, [Codely](https://codely.com)'s mascot).
+Mail wires connected without a single 🐛 thanks to [Codely](https://codely.com) AI tooling. 🐛 < 🐢 💨
