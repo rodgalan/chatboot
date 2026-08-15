@@ -10,6 +10,13 @@ class User private constructor(
     val status: UserStatus,
     val registeredAt: Instant,
 ) {
+    fun activate(): User {
+        if (status == UserStatus.ACTIVE) {
+            throw UserAlreadyActiveError(id.value.toString())
+        }
+        return User(id, email, hashedPassword, role, UserStatus.ACTIVE, registeredAt)
+    }
+
     companion object {
         fun register(email: Email, hashedPassword: HashedPassword): User =
             User(

@@ -47,6 +47,7 @@ class JdbcUserRepository(private val jdbcClient: JdbcClient) : UserRepository {
             """
             INSERT INTO users (id, email, hashed_password, role, status, registered_at)
             VALUES (:id, :email, :hashedPassword, :role, :status, :registeredAt)
+            ON CONFLICT (id) DO UPDATE SET status = :status
             """.trimIndent(),
         )
             .param("id", user.id.value)

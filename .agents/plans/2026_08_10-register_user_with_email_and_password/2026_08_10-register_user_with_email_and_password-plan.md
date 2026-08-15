@@ -17,8 +17,8 @@ implemented_by:
     version: "5"
     reasoning_effort: "medium"
 
-last_implementation_at: "2026-08-10T06:49:24Z"
-has_completed_all_phases: false
+last_implementation_at: "2026-08-15T06:47:47Z"
+has_completed_all_phases: true
 ---
 
 # Register user with email and password
@@ -181,49 +181,49 @@ Add the only new dependencies of the feature and wire the application to the Mai
 
 End-to-end vertical slice of account creation: a client can `POST /api/v1/users` and get a `NonValidated` user with the `User` role persisted in Postgres, with the password hashed and never stored in plain text. Includes the password policy, the email format rule and the email uniqueness rule, because the value objects and the unique constraint that enforce them belong to this slice. The `UserRegistered` event is published here but has no subscriber until Phase 3.
 
-- [ ] Create the Flyway migration `src/main/resources/db/migration/V001__create_users_table.sql` with the `users` table described in the public contracts.
-- [ ] Create the domain value objects under `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `UserId`, `Email` (validating the format on construction), `HashedPassword`, `UserRole` (with the `USER` value) and `UserStatus` (with the `NON_VALIDATED` and `ACTIVE` values).
-- [ ] Create the password policy in `src/main/kotlin/com/rodgalan/chatboot/users/domain/PasswordPolicy.kt`, requiring a minimum length of 12 characters and at least one uppercase letter, one lowercase letter, one digit and one special character.
-- [ ] Create the `User` aggregate in `src/main/kotlin/com/rodgalan/chatboot/users/domain/User.kt` with a `register` factory that produces a user in `NON_VALIDATED` status with the `USER` role.
-- [ ] Create the domain errors in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `InvalidEmailFormatError`, `WeakPasswordError` and `EmailAlreadyRegisteredError`.
-- [ ] Create the domain ports in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `UserRepository` (search by id, search by email, save) and `PasswordHasher` (hash, matches).
-- [ ] Create the `UserRegistered` domain event and the `DomainEventPublisher` port in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`.
-- [ ] Create the `RegisterUser` application service and its `RegisterUserCommand` in `src/main/kotlin/com/rodgalan/chatboot/users/application/`, orchestrating uniqueness check, policy validation, hashing, persistence and event publication.
-- [ ] Create the JDBC adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/persistence/JdbcUserRepository.kt` using `JdbcClient`.
-- [ ] Create the PBKDF2 adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/hashing/Pbkdf2PasswordHasher.kt` using `javax.crypto.SecretKeyFactory` with `PBKDF2WithHmacSHA256`, a per-password random salt and an encoded hash string carrying salt, iterations and digest.
-- [ ] Create the Spring adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/events/SpringDomainEventPublisher.kt` delegating to `ApplicationEventPublisher`.
-- [ ] Create the entry point `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/http/UserPostController.kt` exposing `POST /api/v1/users` with a `RegisterUserRequest` DTO of non-nullable fields.
-- [ ] Create `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/http/UsersApiExceptionHandler.kt` as a `@RestControllerAdvice` mapping `EmailAlreadyRegisteredError` to `409`, `InvalidEmailFormatError` and `WeakPasswordError` to `422`, and unreadable request bodies to `400`.
-- [ ] Add the unit test suites `UserPostControllerTest`, `RegisterUserTest` and `Pbkdf2PasswordHasherTest` with the test cases listed in the public contracts, mocking the domain ports with MockK.
-- [ ] Add the integration test suite `RegisterUserApiTest` with the happy path test case listed in the public contracts, hitting the endpoint and asserting the persisted row.
-- [ ] Verify the changes in terms of typechecking, linting and tests using the project's verification command (`./gradlew check`, with `docker compose up -d` running). Fix issues if any.
-- [ ] STOP. Present the changes to the user for review and suggest commit messages. Do NOT proceed to the next phase until the user explicitly asks.
+- [x] Create the Flyway migration `src/main/resources/db/migration/V001__create_users_table.sql` with the `users` table described in the public contracts.
+- [x] Create the domain value objects under `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `UserId`, `Email` (validating the format on construction), `HashedPassword`, `UserRole` (with the `USER` value) and `UserStatus` (with the `NON_VALIDATED` and `ACTIVE` values).
+- [x] Create the password policy in `src/main/kotlin/com/rodgalan/chatboot/users/domain/PasswordPolicy.kt`, requiring a minimum length of 12 characters and at least one uppercase letter, one lowercase letter, one digit and one special character.
+- [x] Create the `User` aggregate in `src/main/kotlin/com/rodgalan/chatboot/users/domain/User.kt` with a `register` factory that produces a user in `NON_VALIDATED` status with the `USER` role.
+- [x] Create the domain errors in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `InvalidEmailFormatError`, `WeakPasswordError` and `EmailAlreadyRegisteredError`.
+- [x] Create the domain ports in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `UserRepository` (search by id, search by email, save) and `PasswordHasher` (hash, matches).
+- [x] Create the `UserRegistered` domain event and the `DomainEventPublisher` port in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`.
+- [x] Create the `RegisterUser` application service and its `RegisterUserCommand` in `src/main/kotlin/com/rodgalan/chatboot/users/application/`, orchestrating uniqueness check, policy validation, hashing, persistence and event publication.
+- [x] Create the JDBC adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/persistence/JdbcUserRepository.kt` using `JdbcClient`.
+- [x] Create the PBKDF2 adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/hashing/Pbkdf2PasswordHasher.kt` using `javax.crypto.SecretKeyFactory` with `PBKDF2WithHmacSHA256`, a per-password random salt and an encoded hash string carrying salt, iterations and digest.
+- [x] Create the Spring adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/events/SpringDomainEventPublisher.kt` delegating to `ApplicationEventPublisher`.
+- [x] Create the entry point `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/http/UserPostController.kt` exposing `POST /api/v1/users` with a `RegisterUserRequest` DTO of non-nullable fields.
+- [x] Create `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/http/UsersApiExceptionHandler.kt` as a `@RestControllerAdvice` mapping `EmailAlreadyRegisteredError` to `409`, `InvalidEmailFormatError` and `WeakPasswordError` to `422`, and unreadable request bodies to `400`.
+- [x] Add the unit test suites `UserPostControllerTest`, `RegisterUserTest` and `Pbkdf2PasswordHasherTest` with the test cases listed in the public contracts, mocking the domain ports with MockK.
+- [x] Add the integration test suite `RegisterUserApiTest` with the happy path test case listed in the public contracts, hitting the endpoint and asserting the persisted row.
+- [x] Verify the changes in terms of typechecking, linting and tests using the project's verification command (`./gradlew check`, with `docker compose up -d` running). Fix issues if any.
+- [x] STOP. Present the changes to the user for review and suggest commit messages. Do NOT proceed to the next phase until the user explicitly asks.
 
 ### Phase 3: Two-step email verification
 
 End-to-end vertical slice of activation: registering now sends a verification email through Mailpit with a link carrying a single-use token, and confirming that token transitions the account from `NonValidated` to `Active`. Includes every token edge case (unknown, expired, already consumed, already active account).
 
-- [ ] Create the Flyway migration `src/main/resources/db/migration/V002__create_email_verification_tokens_table.sql` with the `email_verification_tokens` table described in the public contracts.
-- [ ] Create the `VerificationToken` value object and the `EmailVerificationToken` entity in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`, the entity knowing whether it is expired at a given instant and whether it has already been consumed.
-- [ ] Add the `activate` behavior to the `User` aggregate, rejecting the transition when the account is already `ACTIVE`.
-- [ ] Create the domain errors `VerificationTokenNotFoundError`, `VerificationTokenExpiredError`, `VerificationTokenAlreadyConsumedError` and `UserAlreadyActiveError` in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`.
-- [ ] Create the domain ports in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `EmailVerificationTokenRepository` (search by token, save), `VerificationTokenGenerator` and `VerificationEmailSender`.
-- [ ] Create the `UserEmailVerified` domain event in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`.
-- [ ] Create the `SendVerificationEmailOnUserRegistered` subscriber in `src/main/kotlin/com/rodgalan/chatboot/users/application/`, generating and storing the token with the configured TTL and delegating the delivery to the `VerificationEmailSender` port.
-- [ ] Create the `VerifyUserEmail` application service and its `VerifyUserEmailCommand` in `src/main/kotlin/com/rodgalan/chatboot/users/application/`, validating the token, consuming it, activating the user and publishing `UserEmailVerified`.
-- [ ] Create the JDBC adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/persistence/JdbcEmailVerificationTokenRepository.kt` using `JdbcClient`.
-- [ ] Create the token generator adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/token/SecureRandomVerificationTokenGenerator.kt` producing a URL-safe random token.
-- [ ] Create the SMTP adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/email/SmtpVerificationEmailSender.kt` using `JavaMailSender`, building the link from `verification-url-template` and rendering the subject and body copy defined in the public contracts.
-- [ ] Create the entry point `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/http/EmailVerificationPostController.kt` exposing `POST /api/v1/users/email-verifications` with an `EmailVerificationRequest` DTO of non-nullable fields.
-- [ ] Extend `UsersApiExceptionHandler` to map `VerificationTokenNotFoundError` to `404`, and `VerificationTokenExpiredError`, `VerificationTokenAlreadyConsumedError` and `UserAlreadyActiveError` to `410`.
-- [ ] Add the unit test suites `EmailVerificationPostControllerTest`, `VerifyUserEmailTest`, `SendVerificationEmailOnUserRegisteredTest` and `SmtpVerificationEmailSenderTest` with the test cases listed in the public contracts, mocking the domain ports and `JavaMailSender` with MockK.
-- [ ] Add the integration test suite `VerifyUserEmailApiTest` with the happy path test case listed in the public contracts, registering a user, reading the issued token and asserting the account becomes `ACTIVE`.
-- [ ] Extend the integration test suite `RegisterUserApiTest` with the `delivers a verification email to the smtp server` test case, asserting the delivery against the Mailpit REST API on `http://localhost:8025` with the already available `RestClient`.
-- [ ] Verify the changes in terms of typechecking, linting and tests using the project's verification command (`./gradlew check`, with `docker compose up -d` running). Fix issues if any.
-- [ ] STOP. Present the changes to the user for review and suggest commit messages. Do NOT proceed to the next phase until the user explicitly asks.
+- [x] Create the Flyway migration `src/main/resources/db/migration/V002__create_email_verification_tokens_table.sql` with the `email_verification_tokens` table described in the public contracts.
+- [x] Create the `VerificationToken` value object and the `EmailVerificationToken` entity in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`, the entity knowing whether it is expired at a given instant and whether it has already been consumed.
+- [x] Add the `activate` behavior to the `User` aggregate, rejecting the transition when the account is already `ACTIVE`.
+- [x] Create the domain errors `VerificationTokenNotFoundError`, `VerificationTokenExpiredError`, `VerificationTokenAlreadyConsumedError` and `UserAlreadyActiveError` in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`.
+- [x] Create the domain ports in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`: `EmailVerificationTokenRepository` (search by token, save), `VerificationTokenGenerator` and `VerificationEmailSender`.
+- [x] Create the `UserEmailVerified` domain event in `src/main/kotlin/com/rodgalan/chatboot/users/domain/`.
+- [x] Create the `SendVerificationEmailOnUserRegistered` subscriber in `src/main/kotlin/com/rodgalan/chatboot/users/application/`, generating and storing the token with the configured TTL and delegating the delivery to the `VerificationEmailSender` port.
+- [x] Create the `VerifyUserEmail` application service and its `VerifyUserEmailCommand` in `src/main/kotlin/com/rodgalan/chatboot/users/application/`, validating the token, consuming it, activating the user and publishing `UserEmailVerified`.
+- [x] Create the JDBC adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/persistence/JdbcEmailVerificationTokenRepository.kt` using `JdbcClient`.
+- [x] Create the token generator adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/token/SecureRandomVerificationTokenGenerator.kt` producing a URL-safe random token.
+- [x] Create the SMTP adapter `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/email/SmtpVerificationEmailSender.kt` using `JavaMailSender`, building the link from `verification-url-template` and rendering the subject and body copy defined in the public contracts.
+- [x] Create the entry point `src/main/kotlin/com/rodgalan/chatboot/users/infrastructure/http/EmailVerificationPostController.kt` exposing `POST /api/v1/users/email-verifications` with an `EmailVerificationRequest` DTO of non-nullable fields.
+- [x] Extend `UsersApiExceptionHandler` to map `VerificationTokenNotFoundError` to `404`, and `VerificationTokenExpiredError`, `VerificationTokenAlreadyConsumedError` and `UserAlreadyActiveError` to `410`.
+- [x] Add the unit test suites `EmailVerificationPostControllerTest`, `VerifyUserEmailTest`, `SendVerificationEmailOnUserRegisteredTest` and `SmtpVerificationEmailSenderTest` with the test cases listed in the public contracts, mocking the domain ports and `JavaMailSender` with MockK.
+- [x] Add the integration test suite `VerifyUserEmailApiTest` with the happy path test case listed in the public contracts, registering a user, reading the issued token and asserting the account becomes `ACTIVE`.
+- [x] Extend the integration test suite `RegisterUserApiTest` with the `delivers a verification email to the smtp server` test case, asserting the delivery against the Mailpit REST API on `http://localhost:8025` with the already available `RestClient`.
+- [x] Verify the changes in terms of typechecking, linting and tests using the project's verification command (`./gradlew check`, with `docker compose up -d` running). Fix issues if any.
+- [x] STOP. Present the changes to the user for review and suggest commit messages. Do NOT proceed to the next phase until the user explicitly asks.
 
 ## ⏭️ Next step
 
-Continue with Phase 2 to implement the end-to-end registration slice (`POST /api/v1/users`), now that the mail dependency and configuration are wired and verified.
+All phases are complete. The registration and email verification flow is fully implemented, tested and wired end to end.
 
-Mail wires connected without a single 🐛 thanks to [Codely](https://codely.com) AI tooling. 🐛 < 🐢 💨
+Verification loop closed, account hatched thanks to [Codely](https://codely.com) AI tooling. 🐛 < 🐢 💨 🥚 🐣
